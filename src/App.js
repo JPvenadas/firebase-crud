@@ -1,6 +1,6 @@
 import './App.css';
 import { useState, useEffect } from 'react';
-import {getDocs, collection, addDoc} from "firebase/firestore";
+import {getDocs, collection, addDoc, doc, updateDoc} from "firebase/firestore";
 import {db} from "./firebase-config"
 
 function App() {
@@ -21,8 +21,20 @@ function App() {
     }));
   };
 
-  const addPeople = () =>{
+  const addPeople = async () =>{
     addDoc(peopleCollection, formData);
+  }
+
+  const addFriends = async(id, currentFriends) =>{
+    const document = doc(db, "people", id);
+    const newFriends = {Friends : Number(currentFriends) + 1};
+    await updateDoc(document, newFriends);
+  }
+
+  const reduceFriends = async(id, currentFriends) =>{
+    const document = doc(db, "people", id);
+    const newFriends = {Friends : Number(currentFriends) - 1};
+    await updateDoc(document, newFriends);
   }
 
 
@@ -62,8 +74,8 @@ function App() {
             <h3>{people.Name}</h3>
             <h6>{people.Name} has a number of {people.Friends} friends</h6>
             <h6>He/she is {people.Emotion}</h6>
-            <button>Increase</button>
-            <button>Decrease</button>
+            <button onClick={()=> addFriends(people.id, people.Friends)}>Increase</button>
+            <button onClick={()=> reduceFriends(people.id, people.Friends)}>Decrease</button>
           </div>
         );
       })}
